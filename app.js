@@ -1,8 +1,7 @@
 import express from 'express';
-
+import { PORT } from './config/env.js';
 
 const app = express();
-const PORT = process.env.PORT || 8000;
 
 app.get('/', (req, res) => {
     res.send('Welcome to the Subscription Service');
