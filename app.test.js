@@ -6,21 +6,14 @@ describe("Subscription Service API", () => {
     describe("POST /auth/sign-in --> login user", () => {
         describe("with Valid Credentials", () => {
             //should return 200 and user data
-            test("should return 200", async () => {
+            test("should return 200 with valid credentials", async () => {
                 const response = await request(app).post("/api/v1/auth/sign-in").send({
                     username: "testuser",
                     password: "testpassword"
                 })
                 expect(response.statusCode).toBe(200);
-            })
-            //should respond with users data
-            test("should respond with user data", async() =>{
-                const response = await request(app).post("/api/v1/auth/sign-in").send({
-                
-                    username: "testuser",
-                    password: "testpassword"
-                })
-                expect(response.body).toHaveProperty("user");
+                expect(response.body).toHaveProperty('user');
+                expect(response.body).toHaveProperty('message', 'Login Successful');
             })
             //should specify json in the content type header
         })
@@ -41,6 +34,13 @@ describe("Subscription Service API", () => {
             })
             //should respond with an error message
             //should specify json in the content type header
+            test("should specify json in the content type header", async () => {
+                const response = await request(app).post("/api/v1/auth/sign-in").send({
+                    username: "testuser",
+                    password: "testpassword"
+                })
+                expect(response.headers['content-type']).toEqual(expect.stringContaining("json"));
+            })
         });
     });
   });
