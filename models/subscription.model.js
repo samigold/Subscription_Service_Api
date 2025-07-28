@@ -130,4 +130,25 @@ Subscription.belongsTo(User, {
   as:       'user'
 });
 
+//auto calculate renewal date if missing 
+Subscription.beforeCreate((subscription, options) => {
+  if (!subscription.renewalDate) {
+    const startDate = new Date(subscription.startDate);
+    switch (subscription.frequency) {
+      case 'daily':
+        subscription.renewalDate = new Date(startDate.setDate(startDate.getDate() + 1));
+        break;
+      case 'weekly':
+        subscription.renewalDate = new Date(startDate.setDate(startDate.getDate() + 7));
+        break;
+      case 'monthly':
+        subscription.renewalDate = new Date(startDate.setMonth(startDate.getMonth() + 1));
+        break;
+      case 'yearly':
+        subscription.renewalDate = new Date(startDate.setFullYear(startDate.getFullYear() + 1));
+        break;
+    }
+  }
+});
+
 export default Subscription;

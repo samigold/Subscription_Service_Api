@@ -1,8 +1,10 @@
 import app from './app.js';
-import connectDB from './Database/pgDb.js';
 import { PORT } from './config/env.js';
+import { connectDb } from './Database/pgDb.js';
 
-await connectDB;
+// Connect to the database
+await connectDb();
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
