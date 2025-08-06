@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-const generateToken = async(res, userId) => {
-    const token = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: '1d'} );
+const generateToken = async(res, email) => {
+    const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: '1d'} );
     console.log("Token", token);
 
     res.cookie('jwt', token, {
@@ -10,6 +10,8 @@ const generateToken = async(res, userId) => {
         sameSite: 'strict',
         maxAge: 24 * 60 * 60 * 1000, //this is 1 day in milliseconds
     })
+
+    return token;
 }
 
 export default generateToken;

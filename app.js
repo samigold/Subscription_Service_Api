@@ -8,12 +8,23 @@ import { errorHandler, notFound } from './middleware/errorHandler.js';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
+// Only import arcjet in non-test environments
+let arcjetMiddleware;
+if (process.env.NODE_ENV !== 'test') {
+    arcjetMiddleware = (await import('./middleware/arcjet.js')).default;
+}
+
 
 const app = express();
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+// Only use arcjet in non-test environments
+if (process.env.NODE_ENV !== 'test' && arcjetMiddleware) {
+    app.use(arcjetMiddleware);
+}
 
 
 

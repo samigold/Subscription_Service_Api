@@ -10,6 +10,8 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll"
   },
   "dependencies": {
+    "@arcjet/inspect": "^1.0.0-beta.9",
+    "@arcjet/node": "^1.0.0-beta.9",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cookie-parser": "~1.4.4",
@@ -22,7 +24,9 @@
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "termii-otp-sdk": "file:../termill-otp-sdk",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
