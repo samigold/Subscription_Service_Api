@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize      from '../Database/pgDb.js';
+import User           from './user.model.js'; // Assuming you have a User model defined
 
 const Subscription = sequelize.define('Subscription', {
   name: {
@@ -85,6 +86,7 @@ const Subscription = sequelize.define('Subscription', {
   startDate: {
     type: DataTypes.DATE,
     allowNull: false,
+    defaultValue: DataTypes.NOW,
     validate: {
       notNull: { msg: 'Start date is required' },
       isDate:  { msg: 'Start date must be a valid date' },
@@ -98,12 +100,12 @@ const Subscription = sequelize.define('Subscription', {
 
    renewalDate: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true, // Allow null initially, will be auto-calculated
     validate: {
-      notNull: { msg: 'Renewal date is required' },
       isDate:  { msg: 'Renewal date must be a valid date' },
       isAfterStart(value) {
-        if (new Date(value) <= new Date(this.startDate)) {
+        // Only validate if value is provided
+        if (value && this.startDate && new Date(value) <= new Date(this.startDate)) {
           throw new Error('Renewal date must be after start date');
         }
       }
@@ -134,20 +136,31 @@ Subscription.belongsTo(User, {
 Subscription.beforeCreate((subscription, options) => {
   if (!subscription.renewalDate) {
     const startDate = new Date(subscription.startDate);
+    let renewalDate;
+    
     switch (subscription.frequency) {
       case 'daily':
-        subscription.renewalDate = new Date(startDate.setDate(startDate.getDate() + 1));
+        renewalDate = new Date(startDate);
+        renewalDate.setDate(startDate.getDate() + 1);
         break;
       case 'weekly':
-        subscription.renewalDate = new Date(startDate.setDate(startDate.getDate() + 7));
+        renewalDate = new Date(startDate);
+        renewalDate.setDate(startDate.getDate() + 7);
         break;
       case 'monthly':
-        subscription.renewalDate = new Date(startDate.setMonth(startDate.getMonth() + 1));
+        renewalDate = new Date(startDate);
+        renewalDate.setMonth(startDate.getMonth() + 1);
         break;
       case 'yearly':
-        subscription.renewalDate = new Date(startDate.setFullYear(startDate.getFullYear() + 1));
+        renewalDate = new Date(startDate);
+        renewalDate.setFullYear(startDate.getFullYear() + 1);
         break;
+      default:
+        renewalDate = new Date(startDate);
+        renewalDate.setMonth(startDate.getMonth() + 1); // Default to monthly
     }
+    
+    subscription.renewalDate = renewalDate;
   }
 });
 
