@@ -1,16 +1,14 @@
 import { Router } from 'express';
+import authorize from '../middleware/verify.js';
+import { getUserProfile, getUserById } from '../controllers/user.controller.js';
 
 const userRouter = Router();
 
-userRouter.get('/profile', (req, res) => {
-    res.json({ message: 'User profile endpoint' });
-});
+userRouter.get('/profile',authorize, getUserProfile);
 
-userRouter.get('/:id', (req, res) => {
-    res.json({ message: `Get User details for ID` });
-});
+userRouter.get('/:id', getUserById);
 
-userRouter.post('/', (req, res) => {
+userRouter.post('/', authorize, (req, res) => {
     res.json({ message: 'Create a new User' });
 }); 
 
