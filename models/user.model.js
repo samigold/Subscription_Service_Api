@@ -1,7 +1,22 @@
 import { DataTypes } from 'sequelize';
+import bcrypt from 'bcryptjs';
 import sequelize from '../Database/pgDb.js';
 
 const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+        allowNull: false, // Required, but will be set in beforeValidate hook
+        validate: {
+            notNull: {
+                msg: 'ID is required'
+            },
+            notEmpty: {
+                msg: 'ID cannot be empty'
+            }
+        }
+    },
+
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -63,5 +78,27 @@ const User = sequelize.define('User', {
 }, {
     timestamps: true,});
 
+
+
+User.beforeValidate(async(user, options) => {
+    // Generate a unique string ID if not already set
+    if (!user.id) {
+        user.id = 'user_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+});
+
+User.beforeCreate(async(user, options) => {
+    if(user.password) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    }
+});
+
+User.beforeUpdate(async(user, options) => {
+    if(user.changed('password')) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    }
+});
 
 export default User;

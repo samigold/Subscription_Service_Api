@@ -2,12 +2,8 @@ import User from "../models/user.model.js";
 
 export const getUserProfile = async (req, res, next) => {
     try {
-        const email = req.user.email; // Assuming user ID is stored in req.user by auth middleware
-        const user = await User.findOne(email);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        // req.user now contains the full user object
+        const user = req.user;
 
         res.status(200).json({
             success: true,

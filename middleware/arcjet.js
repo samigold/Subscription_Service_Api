@@ -3,18 +3,18 @@ import aj from '../config/arcjetConfig.js';
 const arcjetMiddleware = async (req, res, next) => {
     try {
         const decision = await aj.protect(req, {requested: 1});
-        
-        console.log('🔍 Arcjet Decision:', {
-            isDenied: decision.isDenied(),
-            reason: decision.reason,
-            ruleResults: decision.results
-        });
+
+        //console.log('🔍 Arcjet Decision:', {
+        //    isDenied: decision.isDenied(),
+        //    reason: decision.reason,
+        //    ruleResults: decision.results
+        //});
 
         if(decision.isDenied()) {
             console.log('🚫 Arcjet denied request:', decision.reason);
             
             if(decision.reason.isRateLimit()) {
-                console.log('⏰ Rate limit hit!', decision.reason);
+                //console.log('⏰ Rate limit hit!', decision.reason);
                 return res.status(429).json({
                     success: false,
                     message: "Rate limit exceeded. Please try again later."
@@ -22,7 +22,7 @@ const arcjetMiddleware = async (req, res, next) => {
             }
             
             if(decision.reason.isBot()) {
-                console.log('🤖 Bot detected:', decision.reason);
+               // console.log('🤖 Bot detected:', decision.reason);
                 return res.status(403).json({
                     success: false,
                     message: "Bot requests are not allowed."
@@ -35,7 +35,7 @@ const arcjetMiddleware = async (req, res, next) => {
             });
         }
 
-        console.log('✅ Arcjet allowed request');
+        //console.log('✅ Arcjet allowed request');
         next();
 
     } catch (error) {

@@ -5,21 +5,24 @@ const verifyToken = async(token) => {
     try{
         const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-        console.log("Verified Token", verifiedToken);
+        //console.log("Verified Token", verifiedToken);
 
-        const email = verifiedToken.email;
+        const userId = verifiedToken.userId; // Token contains userId, not email
         
-        const user = await User.findOne({where: { email }, attributes: { exclude: ['password'] } },)
+        const user = await User.findByPk(userId, {
+            attributes: { exclude: ['password'] },
+            raw: true // This returns plain object instead of Sequelize instance
+        });
+
+        //write console.log("User from token:", user);
 
         if(!user){
-            res.status(404).json({
-                success: "false",
-                message: "User not found"
-            });
+            return null; // Return null instead of trying to send response
         }
 
-        return email;
+        return user; // Now returns plain object: { id: 'user_...', name: '...', email: '...' }
     } catch(error){
+        console.log("Token verification error:", error.message);
         return null; 
     }
 }

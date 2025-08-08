@@ -1,14 +1,12 @@
 import { Router } from 'express';
-import { createSubscription } from '../controllers/subscription.controller.js';
+import { createSubscription, getUserSubscriptions } from '../controllers/subscription.controller.js';
 import authorize from '../middleware/verify.js';
 
 const subscriptionRouter = Router();
 
 subscriptionRouter.use(authorize);
 
-subscriptionRouter.get('/', (req, res) => {
-    res.json({title: 'Get all subscriptions'})
-})
+subscriptionRouter.get('/', getUserSubscriptions);
 
 subscriptionRouter.get('/:id', (req, res) => {
     res.json({title: 'Get subscription by id'})

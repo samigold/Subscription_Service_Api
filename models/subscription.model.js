@@ -113,7 +113,7 @@ const Subscription = sequelize.define('Subscription', {
   },
 
   userId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
     references: {
         model: User,

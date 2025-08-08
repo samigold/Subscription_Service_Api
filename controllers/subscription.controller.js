@@ -13,15 +13,10 @@ export const createSubscription = async (req, res) => {
             });
         }
 
-        // Find the user by email (req.user contains the email from the token)
-        const user = await User.findOne({ where: { email: req.user } });
-        
-        if (!user) {
-            return res.status(404).json({ 
-                success: false,
-                message: 'User not found' 
-            });
-        }
+        // req.user now contains the full user object
+        const userId = req.user.id;
+
+        console.log("User ID for subscription:", userId);
 
         // Use current date as start date if not provided
         const subscriptionStartDate = startDate ? new Date(startDate) : new Date();
@@ -34,7 +29,7 @@ export const createSubscription = async (req, res) => {
             category,
             paymentMethod,
             startDate: subscriptionStartDate,
-            userId: user.id
+            userId: userId
         });
 
         //console.log('Subscription created:', subscription);
@@ -53,3 +48,56 @@ export const createSubscription = async (req, res) => {
         });
     }
 }; 
+
+export const getUserSubscriptions = async(req, res) => {
+    try {
+        const userId = req.user.id; // Get user ID from authenticated user
+
+        const subscriptions = await Subscription.findAll({ where: { userId } });
+
+        if(subscriptions.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No subscriptions found for this user'
+            });
+        }
+
+           return res.status(200).json({
+            success: true,
+            subscriptions
+        });
+        
+    } catch (error) {
+        console.error('Error fetching user subscriptions:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {})
+        });
+    }
+}
+
+export const getSubscriptionById = async (req, res) => {
+    const subscriptionId = req.params.id;
+    try {
+        const subscription = await Subscription.findByPk(subscriptionId);
+        if (!subscription) {
+            return res.status(404).json({ message: "Subscription not found" });
+        }
+
+        if(subscription.userId !== req.user.id) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'You do not have permission to access this subscription' 
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            subscription
+        });
+    } catch (error) {
+        console.error('Error fetching subscription by ID:', error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};

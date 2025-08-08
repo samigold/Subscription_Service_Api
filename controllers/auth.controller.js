@@ -67,7 +67,7 @@ export const login = async (req, res) => {
         console.error('Error:', error.message)
     }
 
-    generateToken(res, email)
+    generateToken(res, user.id)
 
     res.status(201).json({
         message: "Login Was Successfull!",
@@ -94,17 +94,16 @@ export const signup = async (req, res) => {
         return res.status(400).json({message: 'User is already registered'})
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
         name,
         email,
         username,
-        password: hashedPassword
+        password
     })
 
     if(user){
-   const token = await generateToken(res, email)
+   const token = await generateToken(res, user.id)
 
     return res.status(201).json({
         success: true,
